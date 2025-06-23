@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 import uvicorn
+import requests
+import uuid
 
 app = FastAPI(title="Weather Data System", version="1.0.0")
 
@@ -34,7 +36,32 @@ async def create_weather_request(request: WeatherRequest):
     3. Stores combined data with unique ID in memory
     4. Returns the ID to frontend
     """
-    pass
+    # This should probably go in an env file if I remember to do that later
+    key = "e0463bf67f4c5cafcfe14200e3170191"
+    url = "http://api.weatherstack.com/current"
+    date = request.date
+    location = request.location
+    
+    try:
+        # The API only allows current weather data for free tier, so forced to ignore the date
+        response = requests.post(url, params={
+            "access_key": key,
+            "query": location,},
+            timeout=5)
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching weather data: {str(e)}")
+
+    weather_data = {
+        "date": date,
+        "location": location,
+        "notes": request.notes,
+        "weather_info": response.json()
+    }
+
+    # Generate a unique id and store weather data
+    id = str(uuid.uuid4())
+    weather_storage[id] = weather_data
+    return WeatherResponse(id=id)
 
 @app.get("/weather/{weather_id}")
 async def get_weather_data(weather_id: str):
