@@ -12,12 +12,39 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+interface WeatherInfo {
+  location?: {
+    name: string;
+    country: string;
+    region: string;
+    localtime: string;
+  };
+  current?: {
+    temperature: number;
+    weather_descriptions: string[];
+    wind_speed: number;
+    wind_dir: string;
+    pressure: number;
+    humidity: number;
+    visibility: number;
+    uv_index: number;
+    feelslike: number;
+  };
+  error?: {
+    code: number;
+    type: string;
+    info: string;
+  };
+}
+
 interface WeatherData {
   date: string;
   location: string;
   notes: string;
-  weather_info: JSON;
+  weather_info: WeatherInfo;
 }
+
+
 
 export function WeatherLookup() {
   const [weatherId, setWeatherId] = useState("");
@@ -92,7 +119,7 @@ export function WeatherLookup() {
             </div>
           )}
 
-          [// TODO : Style the displayed weather data instead of just dumping the JSON]
+          {/* [// TODO : Style the displayed weather data instead of just dumping the JSON] */}
 
           {weatherData && (
             <div className="space-y-3">
@@ -120,10 +147,39 @@ export function WeatherLookup() {
                 
                 <div>
                   <Label className="text-sm font-medium">Weather Information:</Label>
-                  <div className="mt-1 p-2 bg-background rounded border">
-                    <pre className="text-xs overflow-auto max-h-48">
-                      {JSON.stringify(weatherData.weather_info, null, 2)}
-                    </pre>
+                  <div className="p-2 grid grid-cols-2 gap-2">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Temperature</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.temperature}°C</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Feels Like</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.feelslike}°C</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Description</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.weather_descriptions?.[0] || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Humidity</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.humidity}%</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Wind Speed</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.wind_speed} km/h</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Wind Direction</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.wind_dir}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">UV Index</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.uv_index}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Pressure</p>
+                          <p className="text-sm font-medium">{weatherData.weather_info.current?.pressure} mb</p>
+                        </div>
                   </div>
                 </div>
               </div>

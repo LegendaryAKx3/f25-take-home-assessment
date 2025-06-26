@@ -5,6 +5,10 @@ from typing import Dict, Any, Optional
 import uvicorn
 import requests
 import uuid
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI(title="Weather Data System", version="1.0.0")
 
@@ -37,7 +41,7 @@ async def create_weather_request(request: WeatherRequest):
     4. Returns the ID to frontend
     """
     # This should probably go in an env file if I remember to do that later
-    key = "e0463bf67f4c5cafcfe14200e3170191"
+    key = os.getenv("API_KEY")
     url = "http://api.weatherstack.com/current"
     date = request.date
     location = request.location
